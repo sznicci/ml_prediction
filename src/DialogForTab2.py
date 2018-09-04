@@ -1,13 +1,10 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-import pandas as pd
 from src.encodeData import *
 import pickle
 
 
 class DialogForTab2(QDialog):
-    NumGridRows = 6
-    NumButtons = 1
 
     def __init__(self):
         super(DialogForTab2, self).__init__()
@@ -23,16 +20,7 @@ class DialogForTab2(QDialog):
         self.stationComboBox()
         self.setLayout(self.mainLayout)
 
-        # self.setWindowTitle("File for training")
-
     def clickPredict(self):
-        filenameDtree = 'finalized_dtree.sav'
-        filenameKnn = 'finalized_knn.sav'
-        filenameClf = 'finalized_clf.sav'
-        loaded_dtree = pickle.load(open(filenameDtree, 'rb'))
-        loaded_knn = pickle.load(open(filenameKnn, 'rb'))
-        loaded_clf = pickle.load(open(filenameClf, 'rb'))
-
         values = pd.DataFrame([(int(self.getCurrentStation()),
                                 encoder_time.transform(pd.DataFrame([self.getTime().toString('HH:mm:00')])
                                                        .values.ravel().astype(str)),
@@ -47,30 +35,61 @@ class DialogForTab2(QDialog):
                                 self.getWindSpeed(self.winds.currentText()))])
 
         print(values)
-        dtreePred = loaded_dtree.predict(values)
-        knnPred = loaded_knn.predict(values)
-        nnPred = loaded_clf.predict(values)
-        print("predicted dtree ", dtreePred)
-        print("predicted knn ", knnPred)
-        print("predicted clf ", nnPred)
+        self.predictBoth(values)
+
+    def predictBoth(self, values):
+        filenameDtree = 'finalized_dtree.sav'
+        filenameKnn = 'finalized_knn.sav'
+        filenameClf = 'finalized_clf.sav'
+        loaded_dtree = pickle.load(open(filenameDtree, 'rb'))
+        loaded_knn = pickle.load(open(filenameKnn, 'rb'))
+        loaded_clf = pickle.load(open(filenameClf, 'rb'))
+
+        dTreePredictionTakeout = loaded_dtree.predict(values)[0]
+        knnPredictionTakeout = loaded_knn.predict(values)[0]
+        nnPredictionTakeout = loaded_clf.predict(values)[0]
+        dTreePredictionReturn = self.exchangeFromTakeoutToReturn(dTreePredictionTakeout)
+        knnPredictionReturn = self.exchangeFromTakeoutToReturn(knnPredictionTakeout)
+        nnPredictionReturn = self.exchangeFromTakeoutToReturn(nnPredictionTakeout)
+        print("predicted takeouts dtree ", dTreePredictionTakeout)
+        print("predicted returns dtree ", dTreePredictionReturn)
+        print("predicted takeouts knn ", knnPredictionTakeout)
+        print("predicted returns knn ", knnPredictionReturn)
+        print("predicted takeouts clf ", nnPredictionTakeout)
+        print("predicted returns clf ", nnPredictionReturn)
 
         print("Predicted status for station {} on day {} and month {}".format(values[0].get(0), values[2].get(0),
-              values[3].get(0)))
+                                                                              values[3].get(0)))
 
         predictionFormBox = QGroupBox("Predicted status for station {} on day {} and month {}".format(values[0].get(0),
                                                                                                       values[2].get(0),
                                                                                                       values[3].get(0)))
 
         subLayout = QFormLayout()
-        subLayout.addRow(QLabel("Decision tree "+str(dtreePred)))
-        subLayout.addRow(QLabel("k-nearest neighbor "+str(knnPred)))
-        subLayout.addRow(QLabel("Neural network "+str(nnPred)))
+        subLayout.addRow(QLabel("Takeouts"),
+                         QLabel("Returns"))
+        subLayout.addRow(QLabel("Decision tree: " + str(dTreePredictionTakeout)),
+                         QLabel("Decision tree: " + str(dTreePredictionReturn)))
+        subLayout.addRow(QLabel("k-nearest neighbor: " + str(knnPredictionTakeout)),
+                         QLabel("k-nearest neighbor: " + str(knnPredictionReturn)))
+        subLayout.addRow(QLabel("Neural network: " + str(nnPredictionTakeout)),
+                         QLabel("Neural network: " + str(nnPredictionReturn)))
 
         predictionFormBox.setLayout(subLayout)
 
         self.mainLayout.addWidget(predictionFormBox)
         print("predict")
 
+    @staticmethod
+    def exchangeFromTakeoutToReturn(takeout):
+        if takeout == 'green':
+            return 'red'
+        elif takeout == 'blue':
+            return 'amber'
+        elif takeout == 'amber':
+            return 'blue'
+        elif takeout == 'red':
+            return 'green'
 
     def createFormGroupBox(self):
         self.formGroupBox = QGroupBox("Predict station status")
@@ -117,7 +136,8 @@ class DialogForTab2(QDialog):
         comboBoxWind.currentIndexChanged.connect(self.getWindSpeed)
         return comboBoxWind
 
-    def getWindSpeed(self, wind):
+    @staticmethod
+    def getWindSpeed(wind):
         if wind == 'calm':  # 0
             return 0
         elif wind == 'light air':  # 1-3
@@ -171,7 +191,8 @@ class DialogForTab2(QDialog):
         elif 25 <= int(self.temperatures.currentText()):
             return ">=25C"
 
-    def dateTimeWidget(self):
+    @staticmethod
+    def dateTimeWidget():
         datePicker = QDateTimeEdit(QDate.currentDate())
         datePicker.setCalendarPopup(True)
         datePicker.setDisplayFormat('dd MMMM')
@@ -180,7 +201,8 @@ class DialogForTab2(QDialog):
     def getDateTime(self):
         return self.date.dateTime()
 
-    def timeWidget(self):
+    @staticmethod
+    def timeWidget():
         timePicker = QTimeEdit(QTime.currentTime())
         timePicker.setCalendarPopup(True)
         timePicker.setDisplayFormat('HH:mm')
