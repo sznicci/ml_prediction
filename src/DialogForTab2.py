@@ -30,12 +30,14 @@ class DialogForTab2(QDialog):
                                                        .values.ravel().astype(str)),
                                 int(self.getDateTime().toString('dd')), int(self.getDateTime().toString('MM')),
                                 encoder_tempMax.transform(pd.DataFrame([self.getTempRange()])
-                                                          .values.ravel().astype(str)), int(self.getTemperature()),
+                                                          .values.ravel().astype(str)),
+                                # int(self.getTemperature()),
                                 encoder_tempMin.transform(pd.DataFrame([self.getMinTempRange()])
-                                                          .values.ravel().astype(str)), int(self.getTemperature()),
+                                                          .values.ravel().astype(str)),
+                                # int(self.getTemperature()),
                                 encoder_rain.transform(pd.DataFrame([self.rains.currentText()])
                                                        .values.ravel().astype(str)),
-                                self.getRain(),
+                                # self.getRain(),
                                 self.getWindSpeed(self.winds.currentText()))])
 
         print(values)
@@ -48,6 +50,8 @@ class DialogForTab2(QDialog):
         loaded_dtree = pickle.load(open(filenameDtree, 'rb'))
         loaded_knn = pickle.load(open(filenameKnn, 'rb'))
         loaded_clf = pickle.load(open(filenameClf, 'rb'))
+
+        print(loaded_dtree.predict(values))
 
         dTreePredictionTakeout = self.convertStatusToString(loaded_dtree.predict(values)[0])
         knnPredictionTakeout = self.convertStatusToString(loaded_knn.predict(values)[0])

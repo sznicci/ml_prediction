@@ -7,7 +7,7 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 import pickle
 
 # Read the data from file
-df = pd.read_csv('G:/total120k_day_month0.csv')
+df = pd.read_csv('G:/total_day_month.csv')
 
 
 # Encode string labels to categories
@@ -49,17 +49,17 @@ encoder_tempMin = encode_tempMinLabels()
 encoder_time = encode_timeLabels()
 
 # Set input data
-X = df.drop(['status_takeouts'], axis=1)
+X = df.drop(['status_takeouts', 'status_returns', 'temp_max_raw', 'temp_min_raw', 'rain_raw'], axis=1)
 
 # Set output data
 y = df['status_takeouts']
 
 
 # Split the data into a training set and a test set
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15)
 
 # Instantiate a decision tree classifier
-dtree = DecisionTreeClassifier(criterion='entropy')
+dtree = DecisionTreeClassifier(criterion="gini", splitter="random")
 
 try:
     dtree.fit(X_train, y_train)

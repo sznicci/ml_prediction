@@ -15,7 +15,7 @@ def trainAndSaveAll(dft):
     encode_timeLabels(dft)
 
     # Set input data
-    Xt = dft.drop(['status_takeouts', 'status_returns'], axis=1)
+    Xt = dft.drop(['status_takeouts', 'status_returns', 'temp_max_raw', 'temp_min_raw', 'rain_raw'], axis=1)
 
     # Set output data
     yt = dft['status_takeouts']
@@ -27,15 +27,15 @@ def trainAndSaveAll(dft):
     trainDF(X_traint, y_traint, X_testt, y_testt)
 
     # train kNN
-    trainKNN(X_traint, y_traint, X_testt, y_testt)
+    # trainKNN(X_traint, y_traint, X_testt, y_testt)
 
     # train NN
-    trainNN(X_traint, y_traint, X_testt, y_testt)
+    # trainNN(X_traint, y_traint, X_testt, y_testt)
 
 
 def trainDF(X_traint, y_traint, X_testt, y_testt):
     # Instantiate a decision tree classifier
-    dtreet = DecisionTreeClassifier(criterion='entropy', splitter='random', max_depth=5)
+    dtreet = DecisionTreeClassifier(criterion='gini', splitter='random')
 
     dtreet.fit(X_traint, y_traint)
 
