@@ -1,5 +1,6 @@
-from src.encodeData import *
 from src.Predict import *
+import pandas as pd
+from sklearn import preprocessing
 from sklearn import neighbors
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
@@ -8,10 +9,10 @@ import pickle
 
 
 def trainAndSaveAll(dft):
-    dft['rain'] = encoder_rain.transform(dft['rain'].astype(str))
-    dft['temp_max'] = encoder_tempMax.transform(dft['temp_max'].astype(str))
-    dft['temp_min'] = encoder_tempMin.transform(dft['temp_min'].astype(str))
-    dft['time'] = encoder_time.transform(dft['time'].astype(str))
+    encode_rainLabels(dft)
+    encode_tempMaxLabels(dft)
+    encode_tempMinLabels(dft)
+    encode_timeLabels(dft)
 
     # Set input data
     Xt = dft.drop(['status_takeouts', 'status_returns'], axis=1)
@@ -73,3 +74,32 @@ def trainNN(X_traint, y_traint, X_testt, y_testt):
 
     print("NN")
     predict(clf, X_testt, y_testt)
+
+
+# Encode string labels to categories
+def encode_timeLabels(dft):
+    le_time = preprocessing.LabelEncoder()
+    timeList = pd.timedelta_range(start='00:00:00', end='23:59:00', freq="1T")
+    le_time.fit(timeList.astype(str))
+    dft['time'] = le_time.transform(dft['time'].astype(str))
+
+
+def encode_rainLabels(dft):
+    le_rain = preprocessing.LabelEncoder()
+
+    le_rain.fit(dft['rain'])
+    dft['rain'] = le_rain.transform(dft['rain'].astype(str))
+
+
+def encode_tempMaxLabels(dft):
+    le_temp_max = preprocessing.LabelEncoder()
+
+    le_temp_max.fit(dft['temp_max'])
+    dft['temp_max'] = le_temp_max.transform(dft['temp_max'].astype(str))
+
+
+def encode_tempMinLabels(dft):
+    le_temp_min = preprocessing.LabelEncoder()
+
+    le_temp_min.fit(dft['temp_min'])
+    dft['temp_min'] = le_temp_min.transform(dft['temp_min'].astype(str))

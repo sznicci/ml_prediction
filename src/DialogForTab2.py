@@ -13,9 +13,13 @@ class DialogForTab2(QDialog):
         self.predictButton = QPushButton("Predict", self)
         self.predictButton.clicked.connect(self.clickPredict)
 
+        self.predictionTextArea = QTextEdit()
+        self.predictionTextArea.resize(300, 300)
+
         self.mainLayout = QVBoxLayout()
         self.mainLayout.addWidget(self.formGroupBox)
         self.mainLayout.addWidget(self.predictButton)
+        self.mainLayout.addWidget(self.predictionTextArea)
 
         self.stationComboBox()
         self.setLayout(self.mainLayout)
@@ -61,23 +65,21 @@ class DialogForTab2(QDialog):
         print("Predicted status for station {} on day {} and month {}".format(values[0].get(0), values[2].get(0),
                                                                               values[3].get(0)))
 
-        predictionFormBox = QGroupBox("Predicted status for station {} on day {} and month {}".format(values[0].get(0),
-                                                                                                      values[2].get(0),
-                                                                                                      values[3].get(0)))
+        self.predictionTextArea.append("\nPredicted status for station {} on day {} and month {}"
+                                       .format(values[0].get(0), values[2].get(0), values[3].get(0)))
 
-        subLayout = QFormLayout()
-        subLayout.addRow(QLabel("Takeouts"),
-                         QLabel("Returns"))
-        subLayout.addRow(QLabel("Decision tree: " + str(dTreePredictionTakeout)),
-                         QLabel("Decision tree: " + str(dTreePredictionReturn)))
-        subLayout.addRow(QLabel("k-nearest neighbor: " + str(knnPredictionTakeout)),
-                         QLabel("k-nearest neighbor: " + str(knnPredictionReturn)))
-        subLayout.addRow(QLabel("Neural network: " + str(nnPredictionTakeout)),
-                         QLabel("Neural network: " + str(nnPredictionReturn)))
-
-        predictionFormBox.setLayout(subLayout)
-
-        self.mainLayout.addWidget(predictionFormBox)
+        header = "\tTakeout \t\t Return"
+        # self.predictionTextArea.insertHtml(text)
+        self.predictionTextArea.append(header)
+        predictionDT = "Decision tree: " + str(dTreePredictionTakeout) + "\t\tDecision tree: " \
+                       + str(dTreePredictionReturn)
+        predictionkNN = "k-nearest neighbor: " + str(knnPredictionTakeout) + "\t\tk-nearest neighbor: " \
+                        + str(knnPredictionReturn)
+        predictionNN = "Neural network: " + str(nnPredictionTakeout) + "\t\tNeural network: " + str(nnPredictionReturn)
+        self.predictionTextArea.append(predictionDT)
+        self.predictionTextArea.append(predictionkNN)
+        self.predictionTextArea.append(predictionNN)
+       
         print("predict")
 
     @staticmethod
