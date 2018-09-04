@@ -1,7 +1,6 @@
-import sys
-from PyQt5.QtCore import *
 from src.DialogForTab1 import *
 from src.DialogForTab2 import *
+import sys
 
 
 class App(QMainWindow):
