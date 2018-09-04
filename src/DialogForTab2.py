@@ -45,9 +45,9 @@ class DialogForTab2(QDialog):
         loaded_knn = pickle.load(open(filenameKnn, 'rb'))
         loaded_clf = pickle.load(open(filenameClf, 'rb'))
 
-        dTreePredictionTakeout = loaded_dtree.predict(values)[0]
-        knnPredictionTakeout = loaded_knn.predict(values)[0]
-        nnPredictionTakeout = loaded_clf.predict(values)[0]
+        dTreePredictionTakeout = self.convertStatusToString(loaded_dtree.predict(values)[0])
+        knnPredictionTakeout = self.convertStatusToString(loaded_knn.predict(values)[0])
+        nnPredictionTakeout = self.convertStatusToString(loaded_clf.predict(values)[0])
         dTreePredictionReturn = self.exchangeFromTakeoutToReturn(dTreePredictionTakeout)
         knnPredictionReturn = self.exchangeFromTakeoutToReturn(knnPredictionTakeout)
         nnPredictionReturn = self.exchangeFromTakeoutToReturn(nnPredictionTakeout)
@@ -89,6 +89,16 @@ class DialogForTab2(QDialog):
         elif takeout == 'amber':
             return 'blue'
         elif takeout == 'red':
+            return 'green'
+
+    def convertStatusToString(self, takeout):
+        if takeout == 1:
+            return 'red'
+        elif takeout == 2:
+            return 'amber'
+        elif takeout == 3:
+            return 'blue'
+        elif takeout == 4:
             return 'green'
 
     def createFormGroupBox(self):
