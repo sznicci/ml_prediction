@@ -14,7 +14,7 @@ def trainAndSaveAll(dft):
     dft['time'] = encoder_time.transform(dft['time'].astype(str))
 
     # Set input data
-    Xt = dft.drop('status_takeouts', axis=1)
+    Xt = dft.drop(['status_takeouts', 'status_returns'], axis=1)
 
     # Set output data
     yt = dft['status_takeouts']
@@ -42,6 +42,7 @@ def trainDF(X_traint, y_traint, X_testt, y_testt):
     filenameDF = 'finalized_dtree.sav'
     pickle.dump(dtreet, open(filenameDF, 'wb'))
 
+    print("DT")
     predict(dtreet, X_testt, y_testt)
 
 
@@ -57,6 +58,7 @@ def trainKNN(X_traint, y_traint, X_testt, y_testt):
     filenameKNN = 'finalized_knn.sav'
     pickle.dump(knn, open(filenameKNN, 'wb'))
 
+    print("kNN")
     predict(knn, X_testt, y_testt)
 
 
@@ -69,4 +71,5 @@ def trainNN(X_traint, y_traint, X_testt, y_testt):
     filenameNN = 'finalized_clf.sav'
     pickle.dump(clf, open(filenameNN, 'wb'))
 
+    print("NN")
     predict(clf, X_testt, y_testt)

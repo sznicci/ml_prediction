@@ -1,8 +1,6 @@
-from PyQt5.QtWidgets import *
-from src.TrainModel import *
-from src.DialogForTab2 import *
 from src.Gui import *
 import pandas as pd
+from src.TrainModel import trainAndSaveAll
 
 
 class DialogForTab1(QDialog):
@@ -17,10 +15,14 @@ class DialogForTab1(QDialog):
         self.selectButton = self.createSelectButton()
         self.trainButton = self.createTrainButton()
 
+        self.progressBar = QProgressBar()
+        self.progressBar.setGeometry(30, 40, 200, 25)
+
         self.mainLayout = QVBoxLayout()
         self.mainLayout.addWidget(self.formGroupBox)
         self.mainLayout.addWidget(self.selectButton)
         self.mainLayout.addWidget(self.trainButton)
+        self.mainLayout.addWidget(self.progressBar)
         self.setLayout(self.mainLayout)
 
         self.setWindowTitle("File for training")
@@ -46,13 +48,20 @@ class DialogForTab1(QDialog):
         self.inputFileName.setText(fileName[0])
 
     def clickTrain(self):
+        self.onStart()
         print(self.inputFileName.text())
         df = pd.read_csv(self.inputFileName.text())
         trainAndSaveAll(df)
+        self.onFinished()
         self.mainLayout.addWidget(QLabel("Success"))
-        self.mainLayout.removeWidget(self.selectButton)
-        self.mainLayout.removeWidget(self.trainButton)
         print("Train")
+
+    def onStart(self):
+        self.progressBar.setValue(50)
+
+    def onFinished(self):
+        # Stop the pulsation
+        self.progressBar.setValue(100)
 
     def createFormGroupBox(self):
         layout = QFormLayout()
